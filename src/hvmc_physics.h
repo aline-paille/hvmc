@@ -54,6 +54,8 @@ struct RigidBody
     f32 rotation = 0.f; 
     f32 angularVelocity = 0.f;
 
+    bool actif=true; // permet de detecter artificiellement les collisions
+
     Collider collider;
 };
 
@@ -69,6 +71,7 @@ struct PhysicsSystem
     RigidBody* AddWall( vec2 const& pos, vec2 const& dims );
 
     std::vector<RigidBody*> rigidBodies;
+    std::vector<CollisionInfo*> collisions;
     vec2 gravity;
 };
 

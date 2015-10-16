@@ -144,5 +144,7 @@ void PhysicsSystem::Update( f32 dt )
         rb->torque = 0.0;
     }
 
+    collisions.clear();
+
 }
 
