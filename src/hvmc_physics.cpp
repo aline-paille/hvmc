@@ -78,5 +78,36 @@ RigidBody* PhysicsSystem::AddWall( vec2 const& pos, vec2 const& dims )
 
 void PhysicsSystem::Update( f32 dt )
 {    
+    // Add gravity
+    for (auto &rb: rigidBodies)
+        rb->ApplyForce(rb->m * gravity);
+
+    // Generate contact info
+    /*for (auto &a: rigidBodies)
+        for (auto &b: rigidBodies)
+        {
+            CollisionInfo info;
+            if (Collide(a,b,info))
+                collisions.push_back(info);
+        }
+        */
+
+    // Integrate forces
+    //for (auto &rb: rigidBodies)
+        //rb->IntegrateForces(dt);    // linearVelocity += a*dt
+                                    // angularVelocity += theta * dt
+
+    // Solve collision
+
+    //Integrate velocities
+    //for (auto &rb: rigidBodies)
+        //rb->IntegrateVelocities(dt);
+
+    for(auto &rb: rigidBodies)
+    {
+        rb->forces = {0.0, 0.0};
+        rb->torque = 0.0;
+    }
+
 }
 
