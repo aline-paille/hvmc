@@ -2,10 +2,15 @@
 
 void RigidBody::Update( f32 dt )
 {
+  vec2 a=im * forces;
+  velocity+=dt*a;
+  position+=dt*velocity;
+  
 }
 
 void RigidBody::ApplyForce( vec2 const& f )
 {
+  forces+=f;
 }
 
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
