@@ -29,8 +29,11 @@ struct RigidBody
     ~RigidBody() {}
     
     void Update( f32 dt );
-    
+    void IntegrateForces(f32 dt);
+    void IntegrateVelocities(f32 dt);
     void ApplyForce( vec2 const& force );
+    void ApplyForceAng( f32 m );
+    void ApplyForce( vec2 const& f ,vec2 const& r);
     void ApplyImpulse( vec2 const& impulse, vec2 const& contactVector );
     
     void SetKinematic();

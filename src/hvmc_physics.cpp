@@ -12,8 +12,33 @@ void RigidBody::ApplyForce( vec2 const& f )
   forces+=f;
 }
 
+void RigidBody::ApplyForceAng( f32 m )
+{
+  torque+=m;
+}
+
+void RigidBody::ApplyForce( vec2 const& f ,vec2 const& r)
+{
+  forces+=f;
+  torque+=Cross(r,f);
+}
+
+void RigidBody::IntegrateForces(f32 dt){
+  vec2 a=im * forces;
+  velocity+=dt*a;
+  f32 theta=im*torque;
+  angularVelocity += theta * dt;
+}
+
+void RigidBody::IntegrateVelocities(f32 dt){
+  position+=dt*velocity;
+  rotation+=dt*angularVelocity;
+}
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 {
+  velocity+=impulse;
+  angularVelocity=Cross(contactVector,impulse);
+  
 }
 
 void RigidBody::SetKinematic()
@@ -40,6 +65,7 @@ RigidBody* PhysicsSystem::AddSphere( vec2 const& pos, f32 radius )
     body->forces = { 0.f, 0.f };
     body->im = 1.f; // 1 kg
     body->iI = 1.f;
+    body->I = 1.f;
     body->m=1.f;
     body->position = pos;
     body->velocity = { 0.f, 0.f };
@@ -57,6 +83,8 @@ RigidBody* PhysicsSystem::AddBox( vec2 const& pos, vec2 const& dims )
     
     body->forces = { 0.f, 0.f };
     body->im = 1.f; // 1 kg
+    body->iI = 1.f;
+    body->I = 1.f;
     body->m=1.f;
     body->position = pos;
     body->velocity = { 0.f, 0.f };
@@ -101,15 +129,14 @@ void PhysicsSystem::Update( f32 dt )
         */
 
     // Integrate forces
-    //for (auto &rb: rigidBodies)
-        //rb->IntegrateForces(dt);    // linearVelocity += a*dt
-                                    // angularVelocity += theta * dt
+    for (auto &rb: rigidBodies)
+        rb->IntegrateForces(dt);
 
     // Solve collision
 
     //Integrate velocities
-    //for (auto &rb: rigidBodies)
-        //rb->IntegrateVelocities(dt);
+    for (auto &rb: rigidBodies)
+        rb->IntegrateVelocities(dt);
 
     for(auto &rb: rigidBodies)
     {
