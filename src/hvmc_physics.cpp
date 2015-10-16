@@ -5,7 +5,6 @@ void RigidBody::Update( f32 dt )
   vec2 a=im * forces;
   velocity+=dt*a;
   position+=dt*velocity;
-  
 }
 
 void RigidBody::ApplyForce( vec2 const& f )
@@ -41,6 +40,7 @@ RigidBody* PhysicsSystem::AddSphere( vec2 const& pos, f32 radius )
     body->forces = { 0.f, 0.f };
     body->im = 1.f; // 1 kg
     body->iI = 1.f;
+    body->m=1.f;
     body->position = pos;
     body->velocity = { 0.f, 0.f };
 
@@ -57,6 +57,7 @@ RigidBody* PhysicsSystem::AddBox( vec2 const& pos, vec2 const& dims )
     
     body->forces = { 0.f, 0.f };
     body->im = 1.f; // 1 kg
+    body->m=1.f;
     body->position = pos;
     body->velocity = { 0.f, 0.f };
     
@@ -84,8 +85,10 @@ RigidBody* PhysicsSystem::AddWall( vec2 const& pos, vec2 const& dims )
 void PhysicsSystem::Update( f32 dt )
 {    
     // Add gravity
-    for (auto &rb: rigidBodies)
+    for (auto & rb: rigidBodies){
         rb->ApplyForce(rb->m * gravity);
+	rb->Update(dt);
+    }
 
     // Generate contact info
     /*for (auto &a: rigidBodies)
