@@ -39,6 +39,9 @@ struct RigidBody
     void SetKinematic();
     void SetGravityMode( int mode );
     
+    vec2 getMinBox()const;
+    vec2 getMaxBox()const;
+
     f32 I = 0.f;  // inertia
     f32 iI = 0.f; // inverse inertia
     f32 m = 0.f;  // mass

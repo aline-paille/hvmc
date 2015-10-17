@@ -1,4 +1,5 @@
 #include "hvmc_physics.h"
+#include <iostream>
 
 void RigidBody::Update( f32 dt )
 {
@@ -44,6 +45,32 @@ void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 void RigidBody::SetKinematic()
 {
     I = iI = m = im = 0.f;
+}
+
+vec2 RigidBody::getMinBox()const
+{
+    Collider c = this->collider;
+    if (c.type == RIGID_BODY_BOX)
+    {
+        vec2 min;
+        min.x = position.x - (c.dims.x/2);
+        min.y = position.y - (c.dims.y/2);
+        return min;
+    }
+    return vec2{-1,-1};
+}
+
+vec2 RigidBody::getMaxBox() const
+{
+    Collider c = this->collider;
+    if (c.type == RIGID_BODY_BOX)
+    {
+        vec2 max;
+        max.x = position.x + (c.dims.x/2);
+        max.y = position.y + (c.dims.y/2);
+        return max;
+    }
+    return vec2{-1,-1};
 }
 
 bool PhysicsSystem::Init()
@@ -114,29 +141,37 @@ void PhysicsSystem::Update( f32 dt )
 {    
     // Add gravity
     for (auto & rb: rigidBodies){
-        rb->ApplyForce(rb->m * gravity);
-	rb->Update(dt);
+        if (rb->actif) {
+            rb->ApplyForce(rb->m * gravity);
+            rb->Update(dt);
+        }
     }
 
     // Generate contact info
-    /*for (auto &a: rigidBodies)
-        for (auto &b: rigidBodies)
-        {
-            CollisionInfo info;
-            if (Collide(a,b,info))
-                collisions.push_back(info);
-        }
-        */
+    for (auto &a: rigidBodies)
+        if (a->actif)
+            for (auto &b: rigidBodies)
+            {
+                CollisionInfo info;
+                if (Collide(a,b,info)){
+                    a->actif = false;
+                    b->actif = false;
+                    //collisions.push_back(info);
+                }
+            }
+
 
     // Integrate forces
     for (auto &rb: rigidBodies)
-        rb->IntegrateForces(dt);
+        if (rb->actif)
+            rb->IntegrateForces(dt);
 
     // Solve collision
 
     //Integrate velocities
     for (auto &rb: rigidBodies)
-        rb->IntegrateVelocities(dt);
+        if (rb->actif)
+            rb->IntegrateVelocities(dt);
 
     for(auto &rb: rigidBodies)
     {
