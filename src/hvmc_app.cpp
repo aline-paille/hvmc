@@ -1,7 +1,11 @@
 #include "hvmc_app.h"
+// ???
+#include "hvmc_collisions.h"
 
 #include <assert.h>
 #include <SDL2/SDL.h>
+
+
 
 bool HVMC_App::Init()
 {
@@ -31,6 +35,9 @@ bool HVMC_App::Init()
         fprintf( stderr, "Error in World::Init()\n" );
         return false;
     }
+
+    // ???
+    initCollide();
 
     return true;
 }

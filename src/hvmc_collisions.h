@@ -11,7 +11,9 @@ struct CollisionInfo
     f32 distIterpen; // distance d'interpenetration
 };
 
-bool Collide(const RigidBody *a, const RigidBody *b, CollisionInfo &info);
+void initCollide();
+
+bool Collide(const RigidBody &a, const RigidBody &b, CollisionInfo &info);
 // faire un tableau 2D de fonctions !
 
 #endif

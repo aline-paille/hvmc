@@ -153,10 +153,13 @@ void PhysicsSystem::Update( f32 dt )
             for (auto &b: rigidBodies)
             {
                 CollisionInfo info;
-                if (Collide(a,b,info)){
+                if (Collide(*a,*b,info)){
                     a->actif = false;
                     b->actif = false;
-                    //collisions.push_back(info);
+                    std::cout << "Collision détectée: " ;
+                    (a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
+                    (b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
+                    collisions.push_back(info);
                 }
             }
 
