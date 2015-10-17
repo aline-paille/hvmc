@@ -18,10 +18,8 @@ bool CollideCircles(const RigidBody &a, const RigidBody &b, CollisionInfo &info)
     f32 raduisSum = pow(a.collider.radius  + b.collider.radius, 2);
     //vec2 ab = b.position-a.position;
     //f32 distCenters = pow(ab.x,2) + pow(ab.y,2);
-    f32 distCenters = pow(b.position.x - a.position.x, 2) + pow(b.position.y + a.position.y,2);
-    if(raduisSum > distCenters)
-        return true;
-    return false;
+    f32 distCenters = pow(b.position.x - a.position.x, 2) + pow(b.position.y - a.position.y,2);
+    return(raduisSum > distCenters);
 }
 
 

@@ -152,6 +152,7 @@ void PhysicsSystem::Update( f32 dt )
         if (a->actif)
             for (auto &b: rigidBodies)
             {
+                if (a!=b){
                 CollisionInfo info;
                 if (Collide(*a,*b,info)){
                     a->actif = false;
@@ -159,7 +160,10 @@ void PhysicsSystem::Update( f32 dt )
                     std::cout << "Collision détectée: " ;
                     (a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
                     (b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
+                    return;
                     collisions.push_back(info);
+                }
+                else std::cout << "A deux !"<< std::endl;
                 }
             }
 
