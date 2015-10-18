@@ -11,7 +11,12 @@ N clamp(N v, N lo, N li)
 }
 
 bool CollideBoxes(const RigidBody &a, const RigidBody &b, CollisionInfo &info){
-    return false;
+    vec2 mina = a.getMinBox();
+    vec2 maxa = a.getMaxBox();
+    vec2 minb = b.getMinBox();
+    vec2 maxb = b.getMaxBox();
+    return (((maxa.x >= minb.x && maxa.x <= maxb.x) || (mina.x >= minb.x && mina.x <= maxb.x)) && 
+	((maxa.y >= minb.y && maxa.y <= maxb.y) || (mina.y >= minb.y && mina.y <= maxb.y)));
 }
 
 bool CollideCircles(const RigidBody &a, const RigidBody &b, CollisionInfo &info){

@@ -143,7 +143,6 @@ void PhysicsSystem::Update( f32 dt )
     for (auto & rb: rigidBodies){
         if (rb->actif) {
             rb->ApplyForce(rb->m * gravity);
-            rb->Update(dt);
         }
     }
 
