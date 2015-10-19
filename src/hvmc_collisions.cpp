@@ -21,8 +21,6 @@ bool CollideBoxes(const RigidBody &a, const RigidBody &b, CollisionInfo &info){
 
 bool CollideCircles(const RigidBody &a, const RigidBody &b, CollisionInfo &info){
     f32 raduisSum = pow(a.collider.radius  + b.collider.radius, 2);
-    //vec2 ab = b.position-a.position;
-    //f32 distCenters = pow(ab.x,2) + pow(ab.y,2);
     f32 distCenters = pow(b.position.x - a.position.x, 2) + pow(b.position.y - a.position.y,2);
     return(raduisSum > distCenters);
 }
@@ -34,11 +32,11 @@ bool CollideBoxCircle(const RigidBody &a /*Box*/, const RigidBody &b, CollisionI
 
     vec2 min = a.getMinBox();
     vec2 max = a.getMaxBox();
-    vec2 extent = vec2{max.x - min.x, max.y - min.y};
+    vec2 extent = vec2{(max.x - min.x) / 2, (max.y - min.y) / 2};
 
     vec2 ab = b.position-a.position;
 
-    vec2 p = vec2{clamp(ab.x, -extent.x, extent.x),clamp(ab.y, -extent.y, extent.y)};
+    vec2 p = vec2{a.position.x + clamp(ab.x, -extent.x, extent.x), a.position.y + clamp(ab.y, -extent.y, extent.y)};
 
     // || p-b^2 || < r^2
     vec2 pb = p-b.position;
