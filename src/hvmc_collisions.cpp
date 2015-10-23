@@ -15,8 +15,42 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     vec2 maxa = a->getMaxBox();
     vec2 minb = b->getMinBox();
     vec2 maxb = b->getMaxBox();
-    return (((maxa.x >= minb.x && maxa.x <= maxb.x) || (mina.x >= minb.x && mina.x <= maxb.x)) &&
-	((maxa.y >= minb.y && maxa.y <= maxb.y) || (mina.y >= minb.y && mina.y <= maxb.y)));
+    if(minb.x > maxa.x || minb.y > maxa.y || mina.x > maxb.x || mina.y > maxb.y)
+      return false;
+    
+    vec2 ab = b->position-a->position;
+    f32 overlapx;
+    f32 overlapy;
+    if(ab.x > 0){
+      //b à droite de a
+      overlapx=maxa.x-minb.x;
+    }else{
+      overlapx=maxb.x-mina.x;
+    }
+    if(ab.y > 0){
+      overlapy=maxa.y-minb.y;
+    }else{
+      overlapy=maxb.y-mina.y;
+    }
+    
+    if(overlapx<overlapy){
+      info.distIterpen=overlapx;
+      info.normContact.y=0;
+      if(ab.y > 0){
+	info.normContact.x=1;
+      }else{
+	info.normContact.x=-1;
+      }
+    }else{
+      info.distIterpen=overlapy;
+      info.normContact.x=0;
+      if(ab.x > 0){
+	info.normContact.y=1;
+      }else{
+	info.normContact.y=-1;
+      }
+    }
+    return true;
 }
 
 bool CollideCircles(RigidBody *a, RigidBody *b, CollisionInfo &info){
