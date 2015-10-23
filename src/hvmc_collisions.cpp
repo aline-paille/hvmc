@@ -57,6 +57,11 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
         info.rb2 = b;
         info.ptcontact = p;
         info.distIterpen = r - dist;
+        if (p.x == max.x) info.normContact = {0,1};
+        else if (p.x == min.x) info.normContact = {0,-1};
+        else if (p.y == max.x) info.normContact = {1,0};
+        else if (p.y == max.x) info.normContact = {-1,0};
+
         return true;
     }
     return false;
