@@ -22,6 +22,13 @@ bool CollideBoxes(const RigidBody &a, const RigidBody &b, CollisionInfo &info){
 bool CollideCircles(const RigidBody &a, const RigidBody &b, CollisionInfo &info){
     f32 raduisSum = pow(a.collider.radius  + b.collider.radius, 2);
     f32 distCenters = pow(b.position.x - a.position.x, 2) + pow(b.position.y - a.position.y,2);
+
+    info.normContact.x = (b.position.x - a.position.x) / abs(b.position.x - a.position.x);
+    info.normContact.y = (b.position.y - a.position.y) / abs(b.position.y - a.position.y);
+    info.distIterpen = b.collider.radius + a.collider.radius - sqrt(pow(b.position.x - a.position.x, 2) + pow(b.position.x - a.position.x, 2));
+    info.ptcontact.x = a.position.x + a.collider.radius * info.normContact.x;
+    info.ptcontact.y = a.position.y + a.collider.radius * info.normContact.y;
+
     return(raduisSum > distCenters);
 }
 

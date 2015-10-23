@@ -9,8 +9,8 @@ struct CollisionInfo
 {
     vec2 normContact; // normale au contact
     f32 distIterpen; // distance d'interpenetration
-    RigidBody rb1;
-    RigidBody rb2;
+    RigidBody* rb1;
+    RigidBody* rb2;
     vec2 ptcontact;
 };
 
