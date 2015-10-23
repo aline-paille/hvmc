@@ -153,7 +153,7 @@ void PhysicsSystem::Update( f32 dt )
             {
                 if (a!=b){
                 CollisionInfo info;
-                if (Collide(*a,*b,info)){
+                if (Collide (a,b,info)){
                     a->actif = false;
                     b->actif = false;
                     std::cout << "Collision détectée: " ;
