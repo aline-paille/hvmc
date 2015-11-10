@@ -25,20 +25,23 @@ void RigidBody::ApplyForce( vec2 const& f ,vec2 const& r)
 }
 
 void RigidBody::IntegrateForces(f32 dt){
-  vec2 a=im * forces;
-  velocity+=dt*a;
-  f32 theta=im*torque;
-  angularVelocity += theta * dt;
+    if (m == 0) return;
+    vec2 a=im * forces;
+    velocity+=dt*a;
+    f32 theta=im*torque;
+    angularVelocity += theta * dt;
 }
 
 void RigidBody::IntegrateVelocities(f32 dt){
-  position+=dt*velocity;
-  rotation+=dt*angularVelocity;
+    if (m == 0) return;
+    position+=dt*velocity;
+    rotation+=dt*angularVelocity;
 }
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 {
-  velocity+=impulse;
-  angularVelocity=Cross(contactVector,impulse);
+
+  velocity+=impulse * im;
+  angularVelocity=Cross(contactVector,impulse * iI);
   
 }
 
@@ -141,42 +144,46 @@ void PhysicsSystem::Update( f32 dt )
 {    
     // Add gravity
     for (auto & rb: rigidBodies){
-        if (rb->actif) {
+        if (rb->m != 0) {
             rb->ApplyForce(rb->m * gravity);
         }
     }
 
     // Generate contact info
     for (auto &a: rigidBodies)
-        if (a->actif)
+        //if (a->actif)
+
             for (auto &b: rigidBodies)
             {
-                if (a!=b){
-                CollisionInfo info;
-                if (Collide (a,b,info)){
-                    a->actif = false;
-                    b->actif = false;
-                    std::cout << "Collision détectée: " ;
-                    (a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
-                    (b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
-                    return;
-                    collisions.push_back(info);
-                }
-                else std::cout << "A deux !"<< std::endl;
+                if (a!=b )
+                    if (a->m != 0 || b->m !=0){
+                        CollisionInfo info;
+                        if (Collide (a,b,info)){
+                            //a->actif = false;
+                            //b->actif = false;
+                            a->SetKinematic();
+                            b->SetKinematic();
+
+                            //std::cout << "Collision détectée: " ;
+                            //(a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
+                            //(b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
+                            return;
+                            collisions.push_back(info);
+                        }
                 }
             }
 
 
     // Integrate forces
     for (auto &rb: rigidBodies)
-        if (rb->actif)
+        if (rb->m != 0)
             rb->IntegrateForces(dt);
 
     // Solve collision
 
     //Integrate velocities
     for (auto &rb: rigidBodies)
-        if (rb->actif)
+        if (rb->m != 0)
             rb->IntegrateVelocities(dt);
 
     for(auto &rb: rigidBodies)

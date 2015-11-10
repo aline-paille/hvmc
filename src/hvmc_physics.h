@@ -58,7 +58,7 @@ struct RigidBody
     f32 rotation = 0.f; 
     f32 angularVelocity = 0.f;
 
-    bool actif=true; // permet de detecter artificiellement les collisions
+    //bool actif=true; // permet de detecter artificiellement les collisions
 
     Collider collider;
 };
