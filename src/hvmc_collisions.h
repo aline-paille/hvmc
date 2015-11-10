@@ -12,12 +12,14 @@ struct CollisionInfo
     RigidBody* rb1;
     RigidBody* rb2;
     vec2 ptcontact;
+
+    void Solve();
 };
 
 void initCollide();
 
 bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info);
-// faire un tableau 2D de fonctions !
+
 
 #endif
 

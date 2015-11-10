@@ -43,10 +43,11 @@ struct RigidBody
     vec2 getMinBox()const;
     vec2 getMaxBox()const;
 
-    f32 I = 0.f;  // inertia
-    f32 iI = 0.f; // inverse inertia
-    f32 m = 0.f;  // mass
-    f32 im = 0.f; // inverse mass
+    f32 I = 0.f;    // inertia
+    f32 iI = 0.f;   // inverse inertia
+    f32 m = 0.f;    // mass
+    f32 im = 0.f;   // inverse mass
+    f32 e = 0.f;    // coefficient de restitution
     
     int gravityMode = 1;
 
@@ -57,8 +58,6 @@ struct RigidBody
     f32 torque = 0.f;
     f32 rotation = 0.f; 
     f32 angularVelocity = 0.f;
-
-    //bool actif=true; // permet de detecter artificiellement les collisions
 
     Collider collider;
 };

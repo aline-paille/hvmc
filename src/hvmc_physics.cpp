@@ -26,6 +26,7 @@ void RigidBody::ApplyForce( vec2 const& f ,vec2 const& r)
 
 void RigidBody::IntegrateForces(f32 dt){
     if (m == 0) return;
+
     vec2 a=im * forces;
     velocity+=dt*a;
     f32 theta=im*torque;
@@ -34,15 +35,14 @@ void RigidBody::IntegrateForces(f32 dt){
 
 void RigidBody::IntegrateVelocities(f32 dt){
     if (m == 0) return;
+
     position+=dt*velocity;
     rotation+=dt*angularVelocity;
 }
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 {
-
   velocity+=impulse * im;
   angularVelocity=Cross(contactVector,impulse * iI);
-  
 }
 
 void RigidBody::SetKinematic()
@@ -96,7 +96,8 @@ RigidBody* PhysicsSystem::AddSphere( vec2 const& pos, f32 radius )
     body->im = 1.f; // 1 kg
     body->iI = 1.f;
     body->I = 1.f;
-    body->m=1.f;
+    body->m = 1.f;
+    body->e = 0.9; // effet boules de billard
     body->position = pos;
     body->velocity = { 0.f, 0.f };
 
@@ -115,7 +116,8 @@ RigidBody* PhysicsSystem::AddBox( vec2 const& pos, vec2 const& dims )
     body->im = 1.f; // 1 kg
     body->iI = 1.f;
     body->I = 1.f;
-    body->m=1.f;
+    body->m = 1.f;
+    body->e = 0.2; // peu élastique
     body->position = pos;
     body->velocity = { 0.f, 0.f };
     
@@ -149,6 +151,7 @@ void PhysicsSystem::Update( f32 dt )
         }
     }
 
+
     // Generate contact info
     for (auto &a: rigidBodies)
         //if (a->actif)
@@ -161,13 +164,13 @@ void PhysicsSystem::Update( f32 dt )
                         if (Collide (a,b,info)){
                             //a->actif = false;
                             //b->actif = false;
-                            a->SetKinematic();
-                            b->SetKinematic();
+                            //a->SetKinematic();
+                            //b->SetKinematic();
 
                             //std::cout << "Collision détectée: " ;
                             //(a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
                             //(b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
-                            return;
+
                             collisions.push_back(info);
                         }
                 }
@@ -180,12 +183,19 @@ void PhysicsSystem::Update( f32 dt )
             rb->IntegrateForces(dt);
 
     // Solve collision
+    for (auto &col: collisions)
+    {
+        col.Solve();
+    }
 
     //Integrate velocities
     for (auto &rb: rigidBodies)
         if (rb->m != 0)
             rb->IntegrateVelocities(dt);
 
+    // Position correction
+
+    // clear forces
     for(auto &rb: rigidBodies)
     {
         rb->forces = {0.0, 0.0};

@@ -94,7 +94,7 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
         if (p.x == max.x) info.normContact = {0,1};
         else if (p.x == min.x) info.normContact = {0,-1};
         else if (p.y == max.x) info.normContact = {1,0};
-        else if (p.y == max.x) info.normContact = {-1,0};
+        else if (p.y == min.x) info.normContact = {-1,0};
 
         return true;
     }
@@ -102,19 +102,6 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
 }
 
 bool CollideCircleBox(RigidBody *a, RigidBody *b/*Box*/, CollisionInfo &info){
-    /*vec2 min = b.getMinBox();
-    vec2 max = b.getMaxBox();
-    vec2 extent = vec2{max.x - min.x, max.y - min.y};
-
-    vec2 ab = a.position-b.position;
-
-    vec2 p = vec2{clamp(ab.x, -extent.x, extent.x),clamp(ab.y, -extent.y, extent.y)};
-
-    // || p-b^2 || < r^2
-    vec2 pb = p-a.position;
-    f32 dist = pow(pb.x,2) + pow(pb.y,2);
-    f32 r = a.collider.radius;
-    return  dist < pow(r,2);*/
     return CollideBoxCircle(b,a,info);
 }
 
@@ -132,4 +119,29 @@ bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
 {
     // mise à jour de info
     return t[a->collider.type][b->collider.type](a,b,info);
+}
+
+
+
+void CollisionInfo::Solve()
+{
+    f32 e = std::min(rb1->e, rb2->e);
+    //vrel = (vb + wb*rb) - (va+wa*ra)
+    vec2 r1 = rb1->position - ptcontact;
+    vec2 r2 = rb2->position - ptcontact;
+
+    auto vrel = (rb2->velocity + Cross(rb2->angularVelocity,r2))  - (rb1->velocity + Cross(rb1->angularVelocity,r1));
+
+    if (Dot(vrel, normContact) <= 0)
+    {
+        auto J = (-(1+e) * Dot(vrel, normContact))/ (rb1->im + rb2->im + rb1->iI * Cross(r1, normContact) + rb2->iI * Cross(r2,normContact));
+
+        vec2 j1 =  -J * normContact;
+        vec2 j2 = J * normContact;
+
+        rb1->ApplyImpulse(j1, ptcontact);
+        rb2->ApplyImpulse(j2, ptcontact);
+
+    }
+
 }
