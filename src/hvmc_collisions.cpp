@@ -1,6 +1,9 @@
 #include "hvmc_collisions.h"
 #include "hvmc_physics.h"
 #include "math.h"
+#include "stdio.h"
+
+#define EPSILON 0.001
 
 template<typename N>
 N clamp(N v, N lo, N li)
@@ -37,24 +40,27 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
       info.distIterpen=overlapx;
       info.normContact.y=0;
       if(ab.y > 0){
-	info.normContact.x=1;
+    info.normContact.x=1;
       }else{
-	info.normContact.x=-1;
+    info.normContact.x=-1;
       }
     }else{
       info.distIterpen=overlapy;
       info.normContact.x=0;
       if(ab.x > 0){
-	info.normContact.y=1;
+    info.normContact.y=1;
       }else{
-	info.normContact.y=-1;
+    info.normContact.y=-1;
       }
     }
+
+    info.rb1 = a;
+    info.rb2 = b;
     return true;
 }
 
 bool CollideCircles(RigidBody *a, RigidBody *b, CollisionInfo &info){
-    f32 raduisSum = pow(a->collider.radius  + b->collider.radius, 2);
+    f32 radiusSum = pow(a->collider.radius  + b->collider.radius, 2);
     f32 distCenters = pow(b->position.x - a->position.x, 2) + pow(b->position.y - a->position.y,2);
 
     info.normContact.x = (b->position.x - a->position.x) / sqrt(distCenters);
@@ -65,7 +71,11 @@ bool CollideCircles(RigidBody *a, RigidBody *b, CollisionInfo &info){
     info.ptcontact.x = a->position.x + a->collider.radius * info.normContact.x;
     info.ptcontact.y = a->position.y + a->collider.radius * info.normContact.y;
 
-    return(raduisSum > distCenters);
+    info.rb1 = a;
+    info.rb2 = b;
+
+   // fprintf(stderr, "raduisSum: %f \tdistCenter: %f\n",radiusSum, distCenters);
+    return(radiusSum > distCenters);
 }
 
 
@@ -83,18 +93,21 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
 
     // || (p-b) ||^2 < r^2
     vec2 pb = p-b->position;
-    f32 dist = pow(pb.x,2) + pow(pb.y,2);
+    f32 dist = LengthSquared(pb);
     f32 r = b->collider.radius;
-    if (dist < pow(r,2))
+    if (dist < r*r)
     {
         info.rb1 = a;
         info.rb2 = b;
         info.ptcontact = p;
         info.distIterpen = r - dist;
-        if (p.x == max.x) info.normContact = {0,1};
-        else if (p.x == min.x) info.normContact = {0,-1};
-        else if (p.y == max.x) info.normContact = {1,0};
-        else if (p.y == min.x) info.normContact = {-1,0};
+        // TODO revoir ça avec un - et eplison
+        //float epsilon = 0.001;
+        if (abs(p.y-max.y) < EPSILON) info.normContact = {0,1};
+        else if (abs(p.y-min.y) < EPSILON) info.normContact = {0,-1};
+        else if (abs(p.x-max.x) < EPSILON) info.normContact = {1,0};
+        else if (abs(p.x-min.x) < EPSILON) info.normContact = {-1,0};
+        //else info.normContact = {0,1};
 
         return true;
     }
@@ -125,16 +138,22 @@ bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
 
 void CollisionInfo::Solve()
 {
+    if (rb1->collider.type == RIGID_BODY_BOX && rb2->collider.type == RIGID_BODY_BOX)
+        fprintf(stderr, "%f %f\n", normContact.x, normContact.y);
     f32 e = std::min(rb1->e, rb2->e);
-    //vrel = (vb + wb*rb) - (va+wa*ra)
+
+    // vrel = (vb + wb*rb) - (va+wa*ra);
     vec2 r1 = rb1->position - ptcontact;
     vec2 r2 = rb2->position - ptcontact;
 
-    auto vrel = (rb2->velocity + Cross(rb2->angularVelocity,r2))  - (rb1->velocity + Cross(rb1->angularVelocity,r1));
+    vec2 vrel = (rb2->velocity + Cross(rb2->angularVelocity,r2))  - (rb1->velocity + Cross(rb1->angularVelocity,r1));
+    //vec2 vrel = rb2->velocity - rb1->velocity;
 
-    if (Dot(vrel, normContact) <= 0)
+    if (Dot(vrel, normContact) < 0)
     {
-        auto J = (-(1+e) * Dot(vrel, normContact))/ (rb1->im + rb2->im + rb1->iI * Cross(r1, normContact) + rb2->iI * Cross(r2,normContact));
+        //auto J = (-(1+e) * Dot(vrel, normContact)) / (rb1->im + rb2->im);
+        auto J = (-(1+e) * Dot(vrel, normContact)) /(rb1->im + rb2->im + rb1->iI * Cross(r1, normContact) + rb2->iI * Cross(r2,normContact));
+        //fprintf(stderr, "J: %f\n", J);
 
         vec2 j1 =  -J * normContact;
         vec2 j2 = J * normContact;
