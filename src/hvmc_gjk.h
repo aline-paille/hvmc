@@ -13,9 +13,11 @@ struct polygon{
   int nb;
 };
 
-vec2 dist_ligne(vec2 pt, vertex ver);
-vertex point_vertex_trimax(vec2 pt, vertex ver, vec2& pp);
-vec2 dist_point_vertex_trimax(vec2 pt, vertex ver);
+
+//tester si le vecteur est nul pour savoir si il y a collision
+vec2 gjk(polygon poly1, polygon poly2);
+void test_gjk();
+void test_gjk_pt_poly();
 void test_dist_ligne();
 void test_dist_point_vertex_trimax();
 #endif

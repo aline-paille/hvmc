@@ -9,8 +9,8 @@ int main( int argc, char** argv )
     HVMC_App app;
     
     //test_dist_ligne();
-    test_dist_point_vertex_trimax();
-    
+    //test_dist_point_vertex_trimax();
+    //test_gjk();
     if ( app.Init() )
     {
         app.SetupScene();
