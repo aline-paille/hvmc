@@ -2,6 +2,7 @@
 #include "hvmc_physics.h"
 #include "math.h"
 #include "stdio.h"
+#include <iostream>
 
 #define EPSILON 0.001
 
@@ -39,7 +40,7 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     if(overlapx<overlapy){
       info.distIterpen=overlapx;
       info.normContact.y=0;
-      if(ab.y > 0){
+      if(ab.y < 0){
     info.normContact.x=1;
       }else{
     info.normContact.x=-1;
@@ -47,7 +48,7 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     }else{
       info.distIterpen=overlapy;
       info.normContact.x=0;
-      if(ab.x > 0){
+      if(ab.x < 0){
     info.normContact.y=1;
       }else{
     info.normContact.y=-1;
@@ -143,12 +144,14 @@ void CollisionInfo::Solve()
     f32 e = std::min(rb1->e, rb2->e);
 
     // vrel = (vb + wb*rb) - (va+wa*ra);
-    vec2 r1 = rb1->position - ptcontact;
-    vec2 r2 = rb2->position - ptcontact;
+    vec2 r1 = -rb1->position + ptcontact;
+    vec2 r2 = -rb2->position + ptcontact;
 
     vec2 vrel = (rb2->velocity + Cross(rb2->angularVelocity,r2))  - (rb1->velocity + Cross(rb1->angularVelocity,r1));
     //vec2 vrel = rb2->velocity - rb1->velocity;
 
+    
+    std::cout << Dot(vrel, normContact) << "\n" ;
     if (Dot(vrel, normContact) < 0)
     {
         //auto J = (-(1+e) * Dot(vrel, normContact)) / (rb1->im + rb2->im);
@@ -157,9 +160,9 @@ void CollisionInfo::Solve()
 
         vec2 j1 =  -J * normContact;
         vec2 j2 = J * normContact;
-
-        rb1->ApplyImpulse(j1, ptcontact);
-        rb2->ApplyImpulse(j2, ptcontact);
+	std::cout << "ca passe  " << j1.x << " " << j1.y << "\n";
+        rb1->ApplyImpulse(j1*3, ptcontact);
+        rb2->ApplyImpulse(j2*3, ptcontact);
 
     }
 

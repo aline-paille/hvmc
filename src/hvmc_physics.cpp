@@ -41,8 +41,10 @@ void RigidBody::IntegrateVelocities(f32 dt){
 }
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 {
+  if (m==0) return;
   velocity+=impulse * im;
-  angularVelocity=Cross(contactVector,impulse ) * iI;
+  if(this->collider.type != RIGID_BODY_BOX)
+    angularVelocity=Cross(contactVector,impulse ) * iI;
 }
 
 void RigidBody::SetKinematic()
