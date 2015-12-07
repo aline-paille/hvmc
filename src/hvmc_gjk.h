@@ -1,6 +1,7 @@
 #include "hvmc_math.h"
 #include <vector>
 #ifndef hvmc_gjk_h
+#define hvmc_gjk_h
 using namespace std;
 
 struct vertex{
@@ -9,6 +10,10 @@ struct vertex{
 };
 
 struct polygon{
+  
+  polygon() {};
+  ~polygon() {};
+  
   vector<vec2> pts;
   int nb;
 };

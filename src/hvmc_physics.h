@@ -4,11 +4,13 @@
 #include <vector>
 #include "hvmc_math.h"
 #include "hvmc_collisions.h"
+#include "hvmc_gjk.h"
 
 enum RigidBodyType
 {
     RIGID_BODY_SPHERE,
     RIGID_BODY_BOX,
+    RIGID_BODY_POLY,
     NB_RIGID_BODY_TYPES,
 };
 
@@ -16,11 +18,11 @@ struct Collider
 {
     Collider() {}
     RigidBodyType type;
-
+    polygon poly;
     union
     {
         f32 radius; // Sphere
-        vec2 dims; // Box
+        vec2 dims; // Box //polygone
     };
 };
 
@@ -71,6 +73,7 @@ struct PhysicsSystem
     
     RigidBody* AddSphere( vec2 const& pos, f32 radius );
     RigidBody* AddBox( vec2 const& pos, vec2 const& dims );
+    RigidBody* AddPoly( vec2 const& pos, vec2 const& dims );
     RigidBody* AddWall( vec2 const& pos, vec2 const& dims );
 
     std::vector<RigidBody*> rigidBodies;

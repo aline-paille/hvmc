@@ -6,6 +6,11 @@ void RigidBody::Update( f32 dt )
   vec2 a=im * forces;
   velocity+=dt*a;
   position+=dt*velocity;
+  if(collider.type == RIGID_BODY_POLY){
+    for (unsigned int i=0; i< collider.poly.pts.size(); i++){
+      collider.poly.pts[i]+=dt*velocity;
+    }
+  }
 }
 
 void RigidBody::ApplyForce( vec2 const& f )
@@ -132,6 +137,36 @@ RigidBody* PhysicsSystem::AddBox( vec2 const& pos, vec2 const& dims )
     return body;
 }
 
+RigidBody* PhysicsSystem::AddPoly( vec2 const& pos, vec2 const& dims )
+{
+    RigidBody* body = new RigidBody; 
+    
+    body->forces = { 0.f, 0.f };
+    body->im = 1.f; // 1 kg
+    body->iI = 1.f;
+    body->I = 1.f;
+    body->m = 1.f;
+    body->e = 0.1; // peu élastique
+    vec2 pos2 = {12.5/5.f,11.f/5.f};
+    body->position = pos2;
+    body->velocity = { 0.f, 0.f };
+    
+    body->collider.type = RIGID_BODY_POLY;
+    vec2 a = {1.f,0.f};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {0.f,3.f};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {2.5,5.f};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {5.f,3.f};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {4.f,0.f};
+    body->collider.poly.pts.push_back(pos+a);
+
+    rigidBodies.push_back( body );
+    return body;
+}
+
 RigidBody* PhysicsSystem::AddWall( vec2 const& pos, vec2 const& dims )
 {
     RigidBody* body = new RigidBody;
@@ -169,6 +204,10 @@ void PhysicsSystem::Update( f32 dt )
                     if (a->m != 0 || b->m !=0){
                         CollisionInfo info;
                         if (Collide(a, b, info)){
+			  if(a->collider.type == RIGID_BODY_POLY && b->collider.type == RIGID_BODY_POLY){
+			    a->SetKinematic();
+			    b->SetKinematic();
+			  }else{
                            //a->SetKinematic();
                            //b->SetKinematic();
 
@@ -180,6 +219,7 @@ void PhysicsSystem::Update( f32 dt )
                             //std::cout << "position : " << a->position << std::endl;
 
                             collisions.push_back(info);
+			  }
                         }
                         //fprintf(stderr, "PROUTTE %f %f\n", info.normContact.x, info.normContact.y);
 

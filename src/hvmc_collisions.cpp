@@ -2,6 +2,7 @@
 #include "hvmc_physics.h"
 #include "math.h"
 #include "stdio.h"
+#include "hvmc_gjk.h"
 #include <iostream>
 
 #define EPSILON 0.001
@@ -120,6 +121,15 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
     return false;
 }
 
+bool CollidePolys(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
+    vec2 dist = gjk(a->collider.poly, b->collider.poly);
+    if(dist.x == 0.f && dist.y == 0.f){
+      return true;
+    }
+    return false;
+}
+
+
 bool CollideCircleBox(RigidBody *a, RigidBody *b/*Box*/, CollisionInfo &info){
     return CollideBoxCircle(b,a,info);
 }
@@ -131,6 +141,7 @@ void initCollide(){
     t[RIGID_BODY_SPHERE][RIGID_BODY_SPHERE] = CollideCircles;
     t[RIGID_BODY_BOX][RIGID_BODY_SPHERE] = CollideBoxCircle;
     t[RIGID_BODY_SPHERE][RIGID_BODY_BOX] = CollideCircleBox;
+    t[RIGID_BODY_POLY][RIGID_BODY_POLY] = CollidePolys;
 }
 
 bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
