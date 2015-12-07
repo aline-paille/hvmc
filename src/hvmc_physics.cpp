@@ -141,44 +141,30 @@ RigidBody* PhysicsSystem::AddBox( vec2 const& pos, vec2 const& dims )
 
 RigidBody* PhysicsSystem::AddPolygon( vec2 const& pos, vec2 const& dims )
 {
+    
     RigidBody* body = new RigidBody; 
     
-    /*body->forces = { 0.f, 0.f };
-    body->im = 1.f; // 1 kg
-    body->iI = 1.f;
-    body->I = 1.f;
-    body->m = 1.f;
-    body->e = 0.1; // peu élastique
-    vec2 pos2 = {12.5/5.f,11.f/5.f};
-    body->position = pos2;
-    body->velocity = { 0.f, 0.f };
-    
-    body->collider.type = RIGID_BODY_POLY;
-    vec2 a = {1.f,0.f};
-    body->collider.poly.pts.push_back(pos+a);
-    a = {0.f,3.f};
-    body->collider.poly.pts.push_back(pos+a);
-    a = {2.5,5.f};
-    body->collider.poly.pts.push_back(pos+a);
-    a = {5.f,3.f};
-    body->collider.poly.pts.push_back(pos+a);
-    a = {4.f,0.f};
-    body->collider.poly.pts.push_back(pos+a);
-    cout << "okkkkkkkkkkk\n";
-    rigidBodies.push_back( body );
-    return body;*/
     body->forces = { 0.f, 0.f };
     body->im = 1.f; // 1 kg
     body->iI = 1.f;
     body->I = 1.f;
     body->m = 1.f;
     body->e = 0.1; // peu élastique
+    //vec2 pos2 = {12.5/10.f,11.f/10.f};
     body->position = pos;
     body->velocity = { 0.f, 0.f };
-
-    body->collider.type = RIGID_BODY_POLY;//RIGID_BODY_BOX;
-    body->collider.dims = dims;
-
+    
+    body->collider.type = RIGID_BODY_POLY;
+    vec2 a = {0.f,0.f};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {0.f,dims.y/2.f};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {dims.x/2.f,dims.y};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {dims.x,dims.y/2.f};
+    body->collider.poly.pts.push_back(pos+a);
+    a = {dims.x,0.f};
+    body->collider.poly.pts.push_back(pos+a);
     rigidBodies.push_back( body );
     return body;
 }
@@ -226,6 +212,7 @@ void PhysicsSystem::Update( f32 dt )
                 {
                     if(a->collider.type == RIGID_BODY_POLY || b->collider.type == RIGID_BODY_POLY)
                         cout << "avant collide\n";
+ 		    if(!((a->collider.type == RIGID_BODY_POLY && b->collider.type != RIGID_BODY_POLY) || (b->collider.type == RIGID_BODY_POLY && a->collider.type != RIGID_BODY_POLY))){
                     CollisionInfo info;
                     if (Collide(a, b, info))
                     {
@@ -243,6 +230,7 @@ void PhysicsSystem::Update( f32 dt )
                             collisions.push_back(info);
                         }
                     }
+		    }
                 }
             }
         }
