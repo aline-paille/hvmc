@@ -190,10 +190,11 @@ void World::AddPoly( vec2 const& pos )
     vec2 ppos = GraphicsToPhysicsPos( gpos ) + vec2{ pdim.x * 0.5f, -pdim.y * 0.5f };
 
     entity.graphics = graphics->AddPolygon( gpos, gdim );
-    entity.physics = physics->AddPoly( ppos, pdim );
-    std::cout << "ok pas de prob\n";
+    entity.physics = physics->AddPolygon( ppos, pdim );
+    //std::cout << "ok pas de prob\n";
     entities.push_back( entity );
 }
+
 void World::ThrowBall( vec2 const& pos )
 {
     Entity entity;

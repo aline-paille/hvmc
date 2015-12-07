@@ -144,13 +144,19 @@ void initCollide(){
     t[RIGID_BODY_BOX][RIGID_BODY_SPHERE] = CollideBoxCircle;
     t[RIGID_BODY_SPHERE][RIGID_BODY_BOX] = CollideCircleBox;
     t[RIGID_BODY_POLY][RIGID_BODY_POLY] = CollidePolys;
-}
+    }
 
 bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
 {
     // mise à jour de inf
     std::cout << a->collider.type;
     std::cout << "uiotgbhiotirjhiljij\n";
+    if(a->collider.type == RIGID_BODY_POLY && b->collider.type != RIGID_BODY_POLY)
+        return t[RIGID_BODY_BOX][b->collider.type](a,b,info);
+
+    if(a->collider.type != RIGID_BODY_POLY && b->collider.type == RIGID_BODY_POLY)
+        return t[a->collider.type][RIGID_BODY_BOX](a,b,info);
+
     return t[a->collider.type][b->collider.type](a,b,info);
 }
 

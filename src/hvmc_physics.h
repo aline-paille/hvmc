@@ -73,7 +73,7 @@ struct PhysicsSystem
     
     RigidBody* AddSphere( vec2 const& pos, f32 radius );
     RigidBody* AddBox( vec2 const& pos, vec2 const& dims );
-    RigidBody* AddPoly( vec2 const& pos, vec2 const& dims );
+    RigidBody* AddPolygon( vec2 const& pos, vec2 const& dims );
     RigidBody* AddWall( vec2 const& pos, vec2 const& dims );
 
     std::vector<RigidBody*> rigidBodies;

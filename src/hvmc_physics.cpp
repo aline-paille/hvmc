@@ -139,11 +139,11 @@ RigidBody* PhysicsSystem::AddBox( vec2 const& pos, vec2 const& dims )
     return body;
 }
 
-RigidBody* PhysicsSystem::AddPoly( vec2 const& pos, vec2 const& dims )
+RigidBody* PhysicsSystem::AddPolygon( vec2 const& pos, vec2 const& dims )
 {
     RigidBody* body = new RigidBody; 
     
-    body->forces = { 0.f, 0.f };
+    /*body->forces = { 0.f, 0.f };
     body->im = 1.f; // 1 kg
     body->iI = 1.f;
     body->I = 1.f;
@@ -165,6 +165,20 @@ RigidBody* PhysicsSystem::AddPoly( vec2 const& pos, vec2 const& dims )
     a = {4.f,0.f};
     body->collider.poly.pts.push_back(pos+a);
     cout << "okkkkkkkkkkk\n";
+    rigidBodies.push_back( body );
+    return body;*/
+    body->forces = { 0.f, 0.f };
+    body->im = 1.f; // 1 kg
+    body->iI = 1.f;
+    body->I = 1.f;
+    body->m = 1.f;
+    body->e = 0.1; // peu élastique
+    body->position = pos;
+    body->velocity = { 0.f, 0.f };
+
+    body->collider.type = RIGID_BODY_POLY;//RIGID_BODY_BOX;
+    body->collider.dims = dims;
+
     rigidBodies.push_back( body );
     return body;
 }
@@ -193,50 +207,53 @@ void PhysicsSystem::Update( f32 dt )
             rb->ApplyForce(rb->m * gravity);
         }
     }
-    cout << "ok pr forces\n";
 
     // Generate contact info
+    /*u32 count = rigidBodies.size();
+    for ( u32 i = 0; i < count - 1; ++i )
+    {
+        for ( u32 j = i + 1; j < count; ++i )
+        {
+            RigidBody* a = rigidBodies[i];
+            RigidBody* b = rigidBodies[j];*/
     for (auto &a: rigidBodies)
-        //if (a->actif)
-
-            for (auto &b: rigidBodies)
+    {
+        for (auto &b: rigidBodies)
+        {
+            if (a!=b )
             {
-
-                if (a!=b )
-                    if (a->m != 0 || b->m !=0){
-                        CollisionInfo info;
-			cout << "okok\n";
-                        if (Collide(a, b, info)){
-			  cout << "ok0\n";
-			  if(a->collider.type == RIGID_BODY_POLY && b->collider.type == RIGID_BODY_POLY){
-			    a->SetKinematic();
-			    b->SetKinematic();
-			  }else{
-                           //a->SetKinematic();
-                           //b->SetKinematic();
-
+                if (a->m != 0 || b->m !=0)
+                {
+                    if(a->collider.type == RIGID_BODY_POLY || b->collider.type == RIGID_BODY_POLY)
+                        cout << "avant collide\n";
+                    CollisionInfo info;
+                    if (Collide(a, b, info))
+                    {
+                        if(a->collider.type == RIGID_BODY_POLY || b->collider.type == RIGID_BODY_POLY)
+                            cout << "collide\n";
+                        if(a->collider.type == RIGID_BODY_POLY || b->collider.type == RIGID_BODY_POLY){
+                            cout << "polygon";
+                            a->SetKinematic();
+                            b->SetKinematic();
+                        }else{
                             //std::cout << "Collision détectée: " ;
                             (a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
                             (b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
 
-                            //std::cout << "masse : " << a->m << std::endl;
-                            //std::cout << "position : " << a->position << std::endl;
-
                             collisions.push_back(info);
-			  }
                         }
-                        //fprintf(stderr, "PROUTTE %f %f\n", info.normContact.x, info.normContact.y);
-
+                    }
                 }
             }
+        }
+    }
 
 
-    cout << "ok1\n";
     // Integrate forces
     for (auto &rb: rigidBodies)
         if (rb->m != 0)
             rb->IntegrateForces(dt);
-    cout << "ok2\n";
+
     // Solve collision
     for (auto &col: collisions)
     {
