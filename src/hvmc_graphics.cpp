@@ -1,7 +1,7 @@
 #include "hvmc_graphics.h"
 
 #include <SDL2/SDL.h>
-
+#include <vector>
 #include "hvmc_utils.h"
 
 void GraphicsComponentRender( GraphicsComponent* component, SDL_Renderer* renderer )

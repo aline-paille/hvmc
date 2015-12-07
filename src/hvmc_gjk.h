@@ -13,7 +13,8 @@ struct polygon{
   int nb;
 };
 
-
+void renderPolygon(polygon p);
+vertex point_vertex_trimax(vec2 pt, vertex ver, vec2& pp);
 //tester si le vecteur est nul pour savoir si il y a collision
 vec2 gjk(polygon poly1, polygon poly2);
 void test_gjk();

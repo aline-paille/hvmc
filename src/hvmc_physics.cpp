@@ -27,24 +27,26 @@ void RigidBody::ApplyForce( vec2 const& f ,vec2 const& r)
 void RigidBody::IntegrateForces(f32 dt){
     if (m == 0) return;
 
-    vec2 a=im * forces;
-    velocity+=dt*a;
-    f32 theta=im*torque;
+    vec2 a = im * forces;
+    velocity += dt * a;
+
+    f32 theta = im * torque;
     angularVelocity += theta * dt;
 }
 
 void RigidBody::IntegrateVelocities(f32 dt){
     if (m == 0) return;
 
-    position+=dt*velocity;
-    rotation+=dt*angularVelocity;
+    position += dt * velocity;
+    rotation += dt * angularVelocity;
 }
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 {
   if (m==0) return;
-  velocity+=impulse * im;
+  velocity += impulse * im;
+
   if(this->collider.type != RIGID_BODY_BOX)
-    angularVelocity=Cross(contactVector,impulse ) * iI;
+    angularVelocity = Cross(contactVector,impulse ) * iI;
 }
 
 void RigidBody::SetKinematic()
@@ -135,6 +137,8 @@ RigidBody* PhysicsSystem::AddWall( vec2 const& pos, vec2 const& dims )
     RigidBody* body = new RigidBody;
 
     body->im = 0.f;
+    body->velocity = { 0.f, 0.f };
+    body->angularVelocity = 0.f;
     body->position = pos;
 
     body->collider.type = RIGID_BODY_BOX;
@@ -160,21 +164,28 @@ void PhysicsSystem::Update( f32 dt )
 
             for (auto &b: rigidBodies)
             {
+
                 if (a!=b )
                     if (a->m != 0 || b->m !=0){
                         CollisionInfo info;
-                        if (Collide (a,b,info)){
-                            //a->SetKinematic();
-                            //b->SetKinematic();
+                        if (Collide(a, b, info)){
+                           //a->SetKinematic();
+                           //b->SetKinematic();
 
                             //std::cout << "Collision détectée: " ;
-                            //(a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
-                            //(b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
+                            (a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
+                            (b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
+
+                            //std::cout << "masse : " << a->m << std::endl;
+                            //std::cout << "position : " << a->position << std::endl;
 
                             collisions.push_back(info);
                         }
+                        //fprintf(stderr, "PROUTTE %f %f\n", info.normContact.x, info.normContact.y);
+
                 }
             }
+
 
 
     // Integrate forces

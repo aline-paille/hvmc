@@ -1,10 +1,9 @@
 #ifndef HVMC_GRAPHICS_H
 #define HVMC_GRAPHICS_H
 
-#include <vector>
 #include <SDL2/SDL.h>
-
 #include "hvmc_math.h"
+#include <vector>
 
 struct SDL_Texture;
 struct SDL_Renderer;
@@ -19,6 +18,7 @@ struct GraphicsComponent
 
 extern void GraphicsComponentRender( GraphicsComponent* component, SDL_Renderer* renderer );
 extern void GraphicsComponentCleanup( GraphicsComponent* component );
+//void addAndRender(polygon poly);
 
 struct GraphicsSystem
 {

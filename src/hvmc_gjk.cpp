@@ -436,3 +436,6 @@ void test_gjk(){
   cout << "Fin de test de la fonction gjk";
 }
 
+void renderPolygon(polygon p){
+
+}

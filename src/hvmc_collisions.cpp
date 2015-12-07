@@ -19,40 +19,46 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     vec2 maxa = a->getMaxBox();
     vec2 minb = b->getMinBox();
     vec2 maxb = b->getMaxBox();
+
     if(minb.x > maxa.x || minb.y > maxa.y || mina.x > maxb.x || mina.y > maxb.y)
       return false;
-    
-    vec2 ab = b->position-a->position;
-    f32 overlapx;
-    f32 overlapy;
-    if(ab.x > 0){
-      //b à droite de a
-      overlapx=maxa.x-minb.x;
-    }else{
-      overlapx=maxb.x-mina.x;
+
+    vec2 ab = b->position - a->position;
+    f32 overlapx, overlapy;
+
+    if(ab.x > 0){   //b à droite de a
+        overlapx = maxa.x - minb.x;
+    }
+    else{
+        overlapx = maxb.x - mina.x;
     }
     if(ab.y > 0){
-      overlapy=maxa.y-minb.y;
-    }else{
-      overlapy=maxb.y-mina.y;
+        overlapy = maxa.y - minb.y;
     }
-    
-    if(overlapx<overlapy){
-      info.distIterpen=overlapx;
-      info.normContact.y=0;
-      if(ab.y < 0){
-    info.normContact.x=1;
-      }else{
-    info.normContact.x=-1;
-      }
-    }else{
-      info.distIterpen=overlapy;
-      info.normContact.x=0;
-      if(ab.x < 0){
-    info.normContact.y=1;
-      }else{
-    info.normContact.y=-1;
-      }
+    else{
+        overlapy = maxb.y - mina.y;
+    }
+
+    if(overlapx < overlapy){
+        info.distIterpen = overlapx;
+        info.normContact.y = 0;
+        if(ab.y < 0)
+        {
+            info.normContact.x = 1;
+        }
+        else{
+            info.normContact.x = -1;
+        }
+    }
+    else {
+        info.distIterpen = overlapy;
+        info.normContact.x = 0;
+        if(ab.x < 0){
+            info.normContact.y = 1;
+        }
+        else {
+            info.normContact.y = -1;
+        }
     }
 
     info.rb1 = a;
@@ -81,7 +87,6 @@ bool CollideCircles(RigidBody *a, RigidBody *b, CollisionInfo &info){
 
 
 bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
-
     // point le plus proche appartenant à la boite
 
     vec2 min = a->getMinBox();
@@ -119,7 +124,6 @@ bool CollideCircleBox(RigidBody *a, RigidBody *b/*Box*/, CollisionInfo &info){
     return CollideBoxCircle(b,a,info);
 }
 
-
 bool (*t[NB_RIGID_BODY_TYPES][NB_RIGID_BODY_TYPES])(RigidBody *a, RigidBody *b, CollisionInfo &info);
 
 void initCollide(){
@@ -135,8 +139,6 @@ bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
     return t[a->collider.type][b->collider.type](a,b,info);
 }
 
-
-
 void CollisionInfo::Solve()
 {
     if (rb1->collider.type == RIGID_BODY_BOX && rb2->collider.type == RIGID_BODY_BOX)
@@ -151,19 +153,18 @@ void CollisionInfo::Solve()
     //vec2 vrel = rb2->velocity - rb1->velocity;
 
     
-    std::cout << Dot(vrel, normContact) << "\n" ;
+    std::cout << "dot: " << Dot(vrel, normContact) << "\n" ;
     if (Dot(vrel, normContact) < 0)
     {
         //auto J = (-(1+e) * Dot(vrel, normContact)) / (rb1->im + rb2->im);
         auto J = (-(1+e) * Dot(vrel, normContact)) /(rb1->im + rb2->im + rb1->iI * Cross(r1, normContact) + rb2->iI * Cross(r2,normContact));
         //fprintf(stderr, "J: %f\n", J);
 
-        vec2 j1 =  -J * normContact;
+        vec2 j1 = -J * normContact;
         vec2 j2 = J * normContact;
 	std::cout << "ca passe  " << j1.x << " " << j1.y << "\n";
-        rb1->ApplyImpulse(j1*3, ptcontact);
-        rb2->ApplyImpulse(j2*3, ptcontact);
 
+        rb1->ApplyImpulse(j1*2, ptcontact);
+        rb2->ApplyImpulse(j2*2, ptcontact);
     }
-
 }
