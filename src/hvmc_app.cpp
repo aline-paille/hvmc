@@ -4,7 +4,7 @@
 
 #include <assert.h>
 #include <SDL2/SDL.h>
-
+#include <iostream>
 
 
 bool HVMC_App::Init()
@@ -110,6 +110,11 @@ void HVMC_App::ProcessEvents()
         if ( event.button.button == SDL_BUTTON_RIGHT )
         {
             world.AddBox( pos );
+        }
+        if(event.button.button ==  SDL_BUTTON_MIDDLE)
+        {
+            std::cout << "poly !!!!" << std::endl;
+            world.AddPoly(pos);
         }
     }
 }

@@ -30,6 +30,7 @@ struct GraphicsSystem
     GraphicsComponent* AddSphere( vec2 const& pos, f32 radius );
     GraphicsComponent* AddBox( vec2 const& pos, vec2 const& dim );
     GraphicsComponent* AddWall( vec2 const& pos, vec2 const& dim );
+    GraphicsComponent* AddPolygon( vec2 const& pos, vec2 const& dim );
 
     SDL_Renderer* renderer;
     std::vector<GraphicsComponent*> components;
@@ -39,11 +40,13 @@ private:
     SDL_Texture* wallHoriTexture;
     SDL_Texture* crateTexture;
     SDL_Texture* smileyTexture;
+    SDL_Texture* polygonTexture;
 
     bool wallVertTextureInit;
     bool wallHoriTextureInit;
     bool crateTextureInit;
     bool smileyTextureInit;
+    bool polygonTextureInit;
 };
 
 #endif

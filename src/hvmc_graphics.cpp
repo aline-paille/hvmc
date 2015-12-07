@@ -27,6 +27,7 @@ bool GraphicsSystem::Init( SDL_Renderer* pRenderer )
     wallHoriTextureInit = false;
     crateTextureInit = false;
     smileyTextureInit = false;
+    polygonTextureInit = false;
     
     return true;
 }
@@ -58,6 +59,28 @@ GraphicsComponent* GraphicsSystem::AddSphere( vec2 const& pos, f32 radius )
     
     comp->texture = smileyTexture;
     
+    components.push_back( comp );
+    return comp;
+}
+GraphicsComponent* GraphicsSystem::AddPolygon( vec2 const& pos, vec2 const& dim )
+{
+    GraphicsComponent* comp = new GraphicsComponent;
+
+    comp->rect = new SDL_Rect;
+    comp->rect->x = (i32)pos.x;
+    comp->rect->y = (i32)pos.y;
+    comp->rect->w = (i32)dim.x;
+    comp->rect->h = (i32)dim.y;
+    comp->rotation = 0.f;
+
+    if ( !polygonTextureInit )
+    {
+        polygonTexture = CreateTextureFromImage( renderer, "assets/pentagon.png" );
+        polygonTextureInit = true;
+    }
+
+    comp->texture = polygonTexture;
+
     components.push_back( comp );
     return comp;
 }

@@ -179,6 +179,20 @@ void World::AddBox( vec2 const& pos )
     entities.push_back( entity );
 }
 
+void World::AddPoly( vec2 const& pos )
+{
+    Entity entity;
+
+    vec2 gdim = { 32.f, 32.f };
+    vec2 gpos = pos - gdim * 0.5f;
+    vec2 pdim = GraphicsToPhysicsDim( gdim );
+    vec2 ppos = GraphicsToPhysicsPos( gpos ) + vec2{ pdim.x * 0.5f, -pdim.y * 0.5f };
+
+    entity.graphics = graphics->AddPolygon( gpos, gdim );
+    entity.physics = physics->AddPolygon( ppos, pdim );
+
+    entities.push_back( entity );
+}
 void World::ThrowBall( vec2 const& pos )
 {
     Entity entity;
