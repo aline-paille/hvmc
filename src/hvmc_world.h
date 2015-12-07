@@ -23,6 +23,7 @@ struct World
     
     void AddBall( vec2 const& pos );
     void AddBox( vec2 const& pos );
+    void AddPoly( vec2 const& pos );
     void ThrowBall( vec2 const& pos );
     
     void Update( f32 dt );
