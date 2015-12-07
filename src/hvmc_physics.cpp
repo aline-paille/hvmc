@@ -6,11 +6,8 @@ void RigidBody::Update( f32 dt )
   vec2 a=im * forces;
   velocity+=dt*a;
   position+=dt*velocity;
-  if(collider.type == RIGID_BODY_POLY){
-    for (unsigned int i=0; i< collider.poly.pts.size(); i++){
-      collider.poly.pts[i]+=dt*velocity;
-    }
-  }
+  
+  std::cout << "jrthuu\n";
 }
 
 void RigidBody::ApplyForce( vec2 const& f )
@@ -41,8 +38,13 @@ void RigidBody::IntegrateForces(f32 dt){
 
 void RigidBody::IntegrateVelocities(f32 dt){
     if (m == 0) return;
-
+    
     position += dt * velocity;
+    if(collider.type == RIGID_BODY_POLY){
+      for (unsigned int i=0; i< collider.poly.pts.size(); i++){
+	collider.poly.pts[i]+=dt*velocity;
+      }
+    }
     rotation += dt * angularVelocity;
 }
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
@@ -162,7 +164,7 @@ RigidBody* PhysicsSystem::AddPoly( vec2 const& pos, vec2 const& dims )
     body->collider.poly.pts.push_back(pos+a);
     a = {4.f,0.f};
     body->collider.poly.pts.push_back(pos+a);
-
+    cout << "okkkkkkkkkkk\n";
     rigidBodies.push_back( body );
     return body;
 }
@@ -191,7 +193,7 @@ void PhysicsSystem::Update( f32 dt )
             rb->ApplyForce(rb->m * gravity);
         }
     }
-
+    cout << "ok pr forces\n";
 
     // Generate contact info
     for (auto &a: rigidBodies)
@@ -203,7 +205,9 @@ void PhysicsSystem::Update( f32 dt )
                 if (a!=b )
                     if (a->m != 0 || b->m !=0){
                         CollisionInfo info;
+			cout << "okok\n";
                         if (Collide(a, b, info)){
+			  cout << "ok0\n";
 			  if(a->collider.type == RIGID_BODY_POLY && b->collider.type == RIGID_BODY_POLY){
 			    a->SetKinematic();
 			    b->SetKinematic();
@@ -227,12 +231,12 @@ void PhysicsSystem::Update( f32 dt )
             }
 
 
-
+    cout << "ok1\n";
     // Integrate forces
     for (auto &rb: rigidBodies)
         if (rb->m != 0)
             rb->IntegrateForces(dt);
-
+    cout << "ok2\n";
     // Solve collision
     for (auto &col: collisions)
     {

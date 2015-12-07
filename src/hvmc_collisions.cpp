@@ -122,7 +122,9 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
 }
 
 bool CollidePolys(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
+    std::cout << "on rentre dans les colide\n";
     vec2 dist = gjk(a->collider.poly, b->collider.poly);
+    std::cout << "mammaia !\n";
     if(dist.x == 0.f && dist.y == 0.f){
       return true;
     }
@@ -146,7 +148,9 @@ void initCollide(){
 
 bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
 {
-    // mise à jour de info
+    // mise à jour de inf
+    std::cout << a->collider.type;
+    std::cout << "uiotgbhiotirjhiljij\n";
     return t[a->collider.type][b->collider.type](a,b,info);
 }
 

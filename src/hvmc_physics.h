@@ -22,7 +22,7 @@ struct Collider
     union
     {
         f32 radius; // Sphere
-        vec2 dims; // Box //polygone
+        vec2 dims; // Box
     };
 };
 
