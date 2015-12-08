@@ -14,6 +14,7 @@ struct CollisionInfo
     vec2 ptcontact;
 
     void Solve();
+    void CorrectPositions();
 };
 
 void initCollide();

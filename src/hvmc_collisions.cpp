@@ -39,11 +39,11 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     else{
         overlapy = maxb.y - mina.y;
     }
-
+    std::cout << ab.y << "\n";
     if(overlapx < overlapy){
         info.distIterpen = overlapx;
         info.normContact.y = 0;
-        if(ab.y < 0)
+        if(ab.y > 0)
         {
             info.normContact.x = 1;
         }
@@ -54,7 +54,7 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     else {
         info.distIterpen = overlapy;
         info.normContact.x = 0;
-        if(ab.x < 0){
+        if(ab.x > 0){
             info.normContact.y = 1;
         }
         else {
@@ -122,9 +122,7 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
 }
 
 bool CollidePolys(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
-    std::cout << "on rentre dans les colide\n";
     vec2 dist = gjk(a->collider.poly, b->collider.poly);
-    std::cout << "mammaia !\n";
     if(dist.x == 0.f && dist.y == 0.f){
       return true;
     }
@@ -149,8 +147,6 @@ void initCollide(){
 bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
 {
     // mise à jour de inf
-    std::cout << a->collider.type;
-    std::cout << "uiotgbhiotirjhiljij\n";
     if(a->collider.type == RIGID_BODY_POLY && b->collider.type != RIGID_BODY_POLY)
         return t[RIGID_BODY_BOX][b->collider.type](a,b,info);
 
@@ -162,9 +158,9 @@ bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
 
 void CollisionInfo::Solve()
 {
-    if (rb1->collider.type == RIGID_BODY_BOX && rb2->collider.type == RIGID_BODY_BOX)
-        fprintf(stderr, "%f %f\n", normContact.x, normContact.y);
+    //if (rb1->collider.type == RIGID_BODY_BOX && rb2->collider.type == RIGID_BODY_BOX)
     f32 e = std::min(rb1->e, rb2->e);
+    std::cout << "on est dans le solve\n";
 
     // vrel = (vb + wb*rb) - (va+wa*ra);
     vec2 r1 = -rb1->position + ptcontact;
@@ -174,7 +170,6 @@ void CollisionInfo::Solve()
     //vec2 vrel = rb2->velocity - rb1->velocity;
 
     
-    std::cout << "dot: " << Dot(vrel, normContact) << "\n" ;
     if (Dot(vrel, normContact) < 0)
     {
         //auto J = (-(1+e) * Dot(vrel, normContact)) / (rb1->im + rb2->im);
@@ -183,9 +178,17 @@ void CollisionInfo::Solve()
 
         vec2 j1 = -J * normContact;
         vec2 j2 = J * normContact;
-	std::cout << "ca passe  " << j1.x << " " << j1.y << "\n";
 
         rb1->ApplyImpulse(j1*2, ptcontact);
         rb2->ApplyImpulse(j2*2, ptcontact);
     }
+}
+
+
+void CollisionInfo::CorrectPositions(){
+  const f32 seuil = 0.01f;
+  const f32 p = 0.5f;
+  vec2 correction = ( std::max( distIterpen - seuil, 0.0f ) / ( rb1->im + rb2->im ) ) * p * normContact;
+  rb1->position = rb1->position - rb1->im * correction;
+  rb2->position += rb2->im * correction;
 }

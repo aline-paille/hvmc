@@ -152,6 +152,7 @@ RigidBody* PhysicsSystem::AddPolygon( vec2 const& pos, vec2 const& dims )
     body->e = 0.1; // peu élastique
     //vec2 pos2 = {12.5/10.f,11.f/10.f};
     body->position = pos;
+    body->collider.dims = dims;
     body->velocity = { 0.f, 0.f };
     
     body->collider.type = RIGID_BODY_POLY;
@@ -235,8 +236,19 @@ void PhysicsSystem::Update( f32 dt )
             }
         }
     }
-
-
+    /*std::vector<int> elem;
+    for (unsigned int i=0; i< collisions.size(); i++){
+      for(unsigned int j=i+1; j< collisions.size(); j++){
+	if(collisions[i].rb1==collisions[j].rb2 || collisions[i].rb2==collisions[j].rb1){
+	  elem.push_back(i);
+	}
+      }
+    }
+    std::unique(elem.begin(), elem.end());
+    for( unsigned int i=0; i< elem.size(); i++){
+      std::cout << elem[i] << "\n";
+      collisions.erase (collisions.begin()+elem[i]);
+    }*/
     // Integrate forces
     for (auto &rb: rigidBodies)
         if (rb->m != 0)
@@ -254,7 +266,8 @@ void PhysicsSystem::Update( f32 dt )
             rb->IntegrateVelocities(dt);
 
     // Position correction
-
+    for (auto &col : collisions)
+      col.CorrectPositions();
     // clear forces
     for(auto &rb: rigidBodies)
     {
