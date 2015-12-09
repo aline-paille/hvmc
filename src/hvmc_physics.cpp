@@ -3,27 +3,27 @@
 
 void RigidBody::Update( f32 dt )
 {
-  vec2 a=im * forces;
-  velocity+=dt*a;
-  position+=dt*velocity;
+  vec2 a = im * forces;
+  velocity += dt * a;
+  position += dt * velocity;
   
   std::cout << "jrthuu\n";
 }
 
 void RigidBody::ApplyForce( vec2 const& f )
 {
-  forces+=f;
+  forces += f;
 }
 
 void RigidBody::ApplyForceAng( f32 m )
 {
-  torque+=m;
+  torque += m;
 }
 
 void RigidBody::ApplyForce( vec2 const& f ,vec2 const& r)
 {
-  forces+=f;
-  torque+=Cross(r,f);
+  forces += f;
+  torque += Cross(r,f);
 }
 
 void RigidBody::IntegrateForces(f32 dt){
@@ -41,15 +41,15 @@ void RigidBody::IntegrateVelocities(f32 dt){
     
     position += dt * velocity;
     if(collider.type == RIGID_BODY_POLY){
-      for (unsigned int i=0; i< collider.poly.pts.size(); i++){
-	collider.poly.pts[i]+=dt*velocity;
-      }
+        for (unsigned int i=0; i< collider.poly.pts.size(); i++){
+            collider.poly.pts[i] += dt * velocity;
+        }
     }
     rotation += dt * angularVelocity;
 }
 void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 {
-  if (m==0) return;
+  if (m == 0) return;
   velocity += impulse * im;
 
   if(this->collider.type != RIGID_BODY_BOX)
@@ -211,23 +211,14 @@ void PhysicsSystem::Update( f32 dt )
             {
                 if (a->m != 0 || b->m !=0)
                 {
-                    if(a->collider.type == RIGID_BODY_POLY || b->collider.type == RIGID_BODY_POLY)
-                        cout << "avant collide\n";
- 		    if(!((a->collider.type == RIGID_BODY_POLY && b->collider.type != RIGID_BODY_POLY) || (b->collider.type == RIGID_BODY_POLY && a->collider.type != RIGID_BODY_POLY))){
+                    if(!((a->collider.type == RIGID_BODY_POLY && b->collider.type != RIGID_BODY_POLY) || (b->collider.type == RIGID_BODY_POLY && a->collider.type != RIGID_BODY_POLY))){
                     CollisionInfo info;
                     if (Collide(a, b, info))
                     {
-                        if(a->collider.type == RIGID_BODY_POLY || b->collider.type == RIGID_BODY_POLY)
-                            cout << "collide\n";
                         if(a->collider.type == RIGID_BODY_POLY || b->collider.type == RIGID_BODY_POLY){
-                            cout << "polygon";
                             a->SetKinematic();
                             b->SetKinematic();
                         }else{
-                            //std::cout << "Collision détectée: " ;
-                            (a->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle "):(std::cout<< "box ");
-                            (b->collider.type == RIGID_BODY_SPHERE) ? (std::cout<< "cercle" << std::endl):(std::cout<< "box" << std::endl);
-
                             collisions.push_back(info);
                         }
                     }
@@ -274,7 +265,6 @@ void PhysicsSystem::Update( f32 dt )
         rb->forces = {0.0, 0.0};
         rb->torque = 0.0;
     }
-
     collisions.clear();
 
 }
