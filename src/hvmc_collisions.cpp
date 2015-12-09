@@ -15,6 +15,13 @@ N clamp(N v, N lo, N li)
     return v;
 }
 
+/** Foction qui teste s'il y a collision entre deux une boxes
+ * @brief CollideBoxes
+ * @param a : box
+ * @param b : box
+ * @param info : structure contennant l'info d'une Collision
+ * @return return true s'il a collision entre a et b
+ */
 bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     vec2 mina = a->getMinBox();
     vec2 maxa = a->getMaxBox();
@@ -27,19 +34,21 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
     vec2 ab = b->position - a->position;
     f32 overlapx, overlapy;
 
+    // on détermine les emplacements de chaque box
     if(ab.x > 0){   //b à droite de a
         overlapx = maxa.x - minb.x;
     }
-    else{
+    else{           //b à gauche de a
         overlapx = maxb.x - mina.x;
     }
-    if(ab.y > 0){
+    if(ab.y > 0){   //b au dessus de a
         overlapy = maxa.y - minb.y;
     }
-    else{
+    else{           //b au dessous de a
         overlapy = maxb.y - mina.y;
     }
-    std::cout << ab.y << "\n";
+
+    // calculs pour remplir la collisionInfo
     if(overlapx < overlapy){
         info.distIterpen = overlapx;
         info.normContact.y = 0;
@@ -62,11 +71,19 @@ bool CollideBoxes(RigidBody *a, RigidBody *b, CollisionInfo &info){
         }
     }
 
+    info.ptcontact = maxa;//{overlapx, overlapy};
     info.rb1 = a;
     info.rb2 = b;
     return true;
 }
 
+/** Foction qui teste s'il y a collision entre deux cercles
+ * @brief CollideCircles
+ * @param a : cercle
+ * @param b : cercle
+ * @param info : structure contennant l'info d'une Collision
+ * @return true s'il a collision entre a et b
+ */
 bool CollideCircles(RigidBody *a, RigidBody *b, CollisionInfo &info){
     f32 radiusSum = pow(a->collider.radius  + b->collider.radius, 2);
     f32 distCenters = pow(b->position.x - a->position.x, 2) + pow(b->position.y - a->position.y,2);
@@ -82,12 +99,17 @@ bool CollideCircles(RigidBody *a, RigidBody *b, CollisionInfo &info){
     info.rb1 = a;
     info.rb2 = b;
 
-   // fprintf(stderr, "raduisSum: %f \tdistCenter: %f\n",radiusSum, distCenters);
     return(radiusSum > distCenters);
 }
 
-
-bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
+/** Foction qui teste s'il y a collision entre une box a et un cercle b
+ * @brief CollideBoxCircle
+ * @param a : box
+ * @param b : cercle
+ * @param info : structure contennant l'info d'une Collision
+ * @return true s'il a collision entre a et b
+ */
+bool CollideBoxCircle(RigidBody *a, RigidBody *b, CollisionInfo &info){
     // point le plus proche appartenant à la boite
 
     vec2 min = a->getMinBox();
@@ -108,20 +130,25 @@ bool CollideBoxCircle(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
         info.rb2 = b;
         info.ptcontact = p;
         info.distIterpen = r - dist;
-        // TODO revoir ça avec un - et eplison
-        //float epsilon = 0.001;
+
         if (abs(p.y-max.y) < EPSILON) info.normContact = {0,1};
         else if (abs(p.y-min.y) < EPSILON) info.normContact = {0,-1};
         else if (abs(p.x-max.x) < EPSILON) info.normContact = {1,0};
         else if (abs(p.x-min.x) < EPSILON) info.normContact = {-1,0};
-        //else info.normContact = {0,1};
 
         return true;
     }
     return false;
 }
 
-bool CollidePolys(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
+/** Foction qui teste s'il y a collision entre deux polygones
+ * @brief CollidePolys
+ * @param a : polygone
+ * @param b : polygone
+ * @param info : structure contennant l'info d'une Collision
+ * @return return true s'il a collision entre a et b
+ */
+bool CollidePolys(RigidBody *a, RigidBody *b, CollisionInfo &info){
     vec2 dist = gjk(a->collider.poly, b->collider.poly);
     if(dist.x == 0.f && dist.y == 0.f){
       return true;
@@ -130,7 +157,14 @@ bool CollidePolys(RigidBody *a /*Box*/, RigidBody *b, CollisionInfo &info){
 }
 
 
-bool CollideCircleBox(RigidBody *a, RigidBody *b/*Box*/, CollisionInfo &info){
+/** Fonction qui teste s'il y a collision entre un cercle a et une box b
+ * @brief CollideCircleBox
+ * @param a : cerlce
+ * @param b : box
+ * @param info : structure contennant l'info d'une Collision
+ * @return true s'il a collision entre a et b et false sinon
+ */
+bool CollideCircleBox(RigidBody *a, RigidBody *b, CollisionInfo &info){
     return CollideBoxCircle(b,a,info);
 }
 
@@ -144,9 +178,15 @@ void initCollide(){
     t[RIGID_BODY_POLY][RIGID_BODY_POLY] = CollidePolys;
     }
 
+/** Fonction générique pour tester s'il y a collision entre deux rigidbdy
+ * @brief Collide
+ * @param a
+ * @param b
+ * @param info
+ * @return
+ */
 bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
 {
-    // mise à jour de inf
     if(a->collider.type == RIGID_BODY_POLY && b->collider.type != RIGID_BODY_POLY)
         return t[RIGID_BODY_BOX][b->collider.type](a,b,info);
 
@@ -156,26 +196,17 @@ bool Collide(RigidBody *a, RigidBody *b, CollisionInfo &info)
     return t[a->collider.type][b->collider.type](a,b,info);
 }
 
+/** Fonction de résolution des collisions */
 void CollisionInfo::Solve()
 {
-    //if (rb1->collider.type == RIGID_BODY_BOX && rb2->collider.type == RIGID_BODY_BOX)
-    f32 e = std::min(rb1->e, rb2->e);
-    std::cout << "on est dans le solve\n";
-
-    // vrel = (vb + wb*rb) - (va+wa*ra);
+    f32 e = std::min(rb1->e, rb2->e);   // e: coeff de restitution
     vec2 r1 = -rb1->position + ptcontact;
     vec2 r2 = -rb2->position + ptcontact;
-
     vec2 vrel = (rb2->velocity + Cross(rb2->angularVelocity,r2))  - (rb1->velocity + Cross(rb1->angularVelocity,r1));
-    //vec2 vrel = rb2->velocity - rb1->velocity;
 
-    
     if (Dot(vrel, normContact) < 0)
     {
-        //auto J = (-(1+e) * Dot(vrel, normContact)) / (rb1->im + rb2->im);
         auto J = (-(1+e) * Dot(vrel, normContact)) /(rb1->im + rb2->im + rb1->iI * Cross(r1, normContact) + rb2->iI * Cross(r2,normContact));
-        //fprintf(stderr, "J: %f\n", J);
-
         vec2 j1 = -J * normContact;
         vec2 j2 = J * normContact;
 
