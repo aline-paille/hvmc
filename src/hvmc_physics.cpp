@@ -6,8 +6,7 @@ void RigidBody::Update( f32 dt )
   vec2 a = im * forces;
   velocity += dt * a;
   position += dt * velocity;
-  
-  std::cout << "jrthuu\n";
+
 }
 
 void RigidBody::ApplyForce( vec2 const& f )
@@ -196,17 +195,13 @@ void PhysicsSystem::Update( f32 dt )
     }
 
     // Generate contact info
-    /*u32 count = rigidBodies.size();
-    for ( u32 i = 0; i < count - 1; ++i )
+    int count = rigidBodies.size();
+    for ( int i=0; i < count ; i++ )
     {
-        for ( u32 j = i + 1; j < count; ++i )
-        {
+         for ( int j= 0; i+1 < count; j++ )
+         {
             RigidBody* a = rigidBodies[i];
-            RigidBody* b = rigidBodies[j];*/
-    for (auto &a: rigidBodies)
-    {
-        for (auto &b: rigidBodies)
-        {
+            RigidBody* b = rigidBodies[j];
             if (a!=b )
             {
                 if (a->m != 0 || b->m !=0)
@@ -227,19 +222,7 @@ void PhysicsSystem::Update( f32 dt )
             }
         }
     }
-    /*std::vector<int> elem;
-    for (unsigned int i=0; i< collisions.size(); i++){
-      for(unsigned int j=i+1; j< collisions.size(); j++){
-	if(collisions[i].rb1==collisions[j].rb2 || collisions[i].rb2==collisions[j].rb1){
-	  elem.push_back(i);
-	}
-      }
-    }
-    std::unique(elem.begin(), elem.end());
-    for( unsigned int i=0; i< elem.size(); i++){
-      std::cout << elem[i] << "\n";
-      collisions.erase (collisions.begin()+elem[i]);
-    }*/
+
     // Integrate forces
     for (auto &rb: rigidBodies)
         if (rb->m != 0)
