@@ -52,7 +52,7 @@ void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
   velocity += impulse * im;
 
   if(this->collider.type != RIGID_BODY_BOX)
-    angularVelocity = Cross(contactVector,impulse ) * iI;
+    angularVelocity = Cross(contactVector - position, impulse ) * iI;
 }
 
 void RigidBody::SetKinematic()
@@ -198,7 +198,7 @@ void PhysicsSystem::Update( f32 dt )
     int count = rigidBodies.size();
     for ( int i=0; i < count ; i++ )
     {
-         for ( int j= 0; i+1 < count; j++ )
+         for ( int j= i+1; j < count; j++ )
          {
             RigidBody* a = rigidBodies[i];
             RigidBody* b = rigidBodies[j];
