@@ -57,7 +57,7 @@ void RigidBody::ApplyImpulse( vec2 const& impulse, vec2 const& contactVector )
 
 void RigidBody::SetKinematic()
 {
-    I = iI = m = im = 0.f;
+    I = iI = m = im = 0.f ;
 }
 
 vec2 RigidBody::getMinBox()const
