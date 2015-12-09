@@ -9,24 +9,26 @@
 using namespace std;
 
 vec2 dist_ligne(vec2 pt, vertex ver){
+  //calcul vecteur AB
   vec2 ab = ver.pts[1]-ver.pts[0];
+  //normale au vecteur
   vec2 n=ab/(Length(ab));
+  //Calcul de u et v 
   f32 v=Dot(pt-ver.pts[0],n)/Length(ab);
-  //cout << "u : " << u;
   f32 u=Dot(ver.pts[1]-pt,n)/Length(ab);
-  //cout << "v : " << v;
+  //soit le poit le plus proche est a droite de A ou a droite de B
   if (u <= 0){
-    //cout << "\nA\n";
     return ver.pts[1];
   }
   if(v <= 0){
-    //cout << "\nB\n";
     return ver.pts[0];
   }
-  //cout << "\nmélange\n";
+  //sinon le pt le plus proche est sur le segment AB et c'est une pondération des valeurs de A et de B
   return u*ver.pts[0] + v*ver.pts[1];
 }
 
+
+//fonction de conversion/test pour point_vertex_trimax
 vec2 dist_point_vertex_trimax(vec2 pt, vertex ver){
   vec2 pp;
   vertex res=point_vertex_trimax(pt, ver, pp);
@@ -41,48 +43,53 @@ vec2 dist_point_vertex_trimax(vec2 pt, vertex ver){
   }
 }
 
-
+//fonction de calcul du support du point le plus proche entre un point et un autre point, un segment, un triangle
 vertex point_vertex_trimax(vec2 pt, vertex ver, vec2& pp){
   vertex res;
+  //selon la taille du vertex 
   switch(ver.pts.size()){
     case 1 : 
     {
+      //si c'est un point on renvoie le point
       pp=ver.pts[0];
       return ver;
     }
     case 2 : {
+      //si c'est un segment on utilise dist_ligne
       pp=dist_ligne(pt,ver);
       return ver;
     }
     case 3 : 
     {
+      //si c'est un triangle
+      //calcul des segments du triangle et de QA, QB, QC ou Q est le point dont on cherche a connaitre la distance au vertex
       vec2 ab = ver.pts[1]-ver.pts[0];
-      //cout << "\n" << ab.x << ", " << ab.y << "\n";
       vec2 bc = ver.pts[2]-ver.pts[1];
       vec2 ac = ver.pts[2]-ver.pts[0];
       vec2 qa = ver.pts[0]-pt;
       vec2 qb = ver.pts[1]-pt;
       vec2 qc = ver.pts[2]-pt;
+      //calcul des normales
       vec2 nAB = ab/(Length(ab));
       vec2 nBC = bc/(Length(bc));
       vec2 nCA = -ac/(Length(ac));
+      //calcul des aires
       f32 areaABC = Cross(ab,ac)/2.f;
       f32 areaQBC = Cross(qb,qc)/2.f;
       f32 areaQCA = Cross(qc,qa)/2.f;
       f32 areaQAB = Cross(qa,qb)/2.f;
-      //cout << "\n cross(ab,ac) " << Cross(ab,ac) << "\n";
+      //Calcul des u,v pr chaque segment
       f32 vAB = Dot(pt-ver.pts[0],nAB)/Length(ab);
       f32 uAB = Dot(ver.pts[1]-pt,nAB)/Length(ab);
       f32 vBC = Dot(pt-ver.pts[1],nBC)/Length(bc);
       f32 uBC = Dot(ver.pts[2]-pt,nBC)/Length(bc);
       f32 vCA = Dot(pt-ver.pts[2],nCA)/Length(ac);
       f32 uCA = Dot(ver.pts[0]-pt,nCA)/Length(ac);
+      //calcul de u,v,w pour le triangle
       f32 uABC = areaQBC/areaABC;
-      //cout << "\n" << uABC << "\n";
       f32 vABC = areaQCA/areaABC;
-      //cout << "\n" << vABC << "\n";
       f32 wABC = areaQAB/areaABC;
-      //cout << "\n" << wABC << "\n";
+      //si le pt le plus proche est un point
       if(uAB <= 0 && vBC <= 0){
 	res.pts.push_back(ver.pts[1]);
 	pp=ver.pts[1];
@@ -98,28 +105,27 @@ vertex point_vertex_trimax(vec2 pt, vertex ver, vec2& pp){
 	pp=ver.pts[0];
 	return res;
       }
+      //si le point le plus proche est une ligne
       vertex ligne;
       if(uABC > 0 && vABC > 0 && wABC <= 0){
-	//cout << "w\n";
 	ligne.pts.push_back(ver.pts[0]);
 	ligne.pts.push_back(ver.pts[1]);
 	pp=dist_ligne(pt,ligne);
 	return ligne;
       }
       if(uABC > 0 && vABC <= 0 && wABC > 0){
-	//cout << "v\n";
 	ligne.pts.push_back(ver.pts[0]);
 	ligne.pts.push_back(ver.pts[2]);
 	pp=dist_ligne(pt,ligne);
 	return ligne;
       }
       if(uABC <= 0 && vABC > 0 && wABC > 0){
-	//cout << "u\n";
 	ligne.pts.push_back(ver.pts[1]);
 	ligne.pts.push_back(ver.pts[2]);
 	pp=dist_ligne(pt,ligne);
 	return ligne;
       }
+      //sinon il est sur le triangle ou a l'interieur
       if(uABC > 0 && vABC > 0 && wABC > 0){
 	res.pts.push_back(pt);
 	pp=pt;
@@ -128,6 +134,7 @@ vertex point_vertex_trimax(vec2 pt, vertex ver, vec2& pp){
     }
     default : 
     {
+      //si la taille du vecteur est mauvaise
       res.pts.push_back({-1.f,-1.f});
       pp={-1.f,-1.f};
       return res;
@@ -135,10 +142,11 @@ vertex point_vertex_trimax(vec2 pt, vertex ver, vec2& pp){
   }
 }
 
-
+//Fonction de calcul du vecteur support d
 int support(polygon &poly, vec2& d){
   int index =0;
   float max = Dot (d, poly.pts[index]);
+  //calcul du point du polygone qui maximize le Dot
   for (unsigned int i=0; i<poly.pts.size(); i++){
     float val = Dot(d,poly.pts[i]);
     if(val > max){
@@ -149,6 +157,8 @@ int support(polygon &poly, vec2& d){
   return index;
 }
 
+
+//Fonction de calcul de la distance entre un point et un polygone
 vec2 gjk_pt_poly(vec2 pt, polygon poly){
   int r=0;
   vec2 d;
@@ -189,11 +199,14 @@ vec2 gjk_pt_poly(vec2 pt, polygon poly){
   return pp; 
 }
 
+
+//Fonction de calcul du vecteur support d augmentee avec la difference de Minkovski
 vec2 support2(polygon &poly1, polygon &poly2, vec2& d){
   int index1 =0;
   int index2 =0;
   float max1 = Dot (d, poly1.pts[index1]);
   float max2 = Dot (-d, poly2.pts[index2]);
+  //trouver le max dans la direction d pour poly1
   for (unsigned int i=0; i<poly1.pts.size(); i++){
     float val = Dot(d,poly1.pts[i]);
     if(val > max1){
@@ -201,6 +214,7 @@ vec2 support2(polygon &poly1, polygon &poly2, vec2& d){
       max1=val;
     }
   }
+  //trouver le max dans la direction -d pour poly2
   for (unsigned int i=0; i<poly2.pts.size(); i++){
     float val = Dot(-d,poly2.pts[i]);
     if(val > max2){
@@ -211,6 +225,8 @@ vec2 support2(polygon &poly1, polygon &poly2, vec2& d){
   return poly1.pts[index1] - poly2.pts[index2];
 }
 
+
+//gjk de polygone a polygone
 vec2 gjk(polygon poly1, polygon poly2){
   int r=0;
   vec2 d;
@@ -436,6 +452,3 @@ void test_gjk(){
   cout << "Fin de test de la fonction gjk";
 }
 
-void renderPolygon(polygon p){
-
-}
